@@ -18,7 +18,7 @@ async def initialize_checkpointer():
     Saver.pool = AsyncConnectionPool(DB_URI, kwargs={"autocommit": True}, open=False)
     await Saver.pool.open()
     
-    saver = AsyncPostgresSaver(Saver.pool)
-    await saver.setup()
+    Saver.saver = AsyncPostgresSaver(Saver.pool)
+    await Saver.saver.setup()
     
     print("Langgraph DB schema ready...")

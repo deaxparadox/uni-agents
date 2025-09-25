@@ -5,14 +5,15 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from ai.serializers.agent import AgentSerializer
-from ai.agents.enterpreneur_agent import stream_graph_updates
+from ai.agents.enterpreneur_agent import entrepreneur_agent
 
 class AgentView(APIView):
     async def post(self, request):
         try:
             agent_serializer = AgentSerializer(data=request.data)
             if agent_serializer.is_valid():
-                await stream_graph_updates("What can you help me with?")
+                user_input = agent_serializer.validated_data.get("user_input")
+                await entrepreneur_agent(user_input)
                 return Response({"message": agent_serializer.data}, status=status.HTTP_200_OK)
             return Response({"error": agent_serializer.errros}, status=status.HTTP_200_OK)
         except Exception as e:
