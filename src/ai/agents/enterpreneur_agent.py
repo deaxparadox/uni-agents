@@ -1,7 +1,7 @@
+import asyncio
 from typing import Annotated
 
 from typing_extensions import TypedDict
-
 from langgraph.graph import END, StateGraph, START
 from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
@@ -10,11 +10,12 @@ from ai.prompts.enterpreneur_assistant import enterpreneur_agent_prompt
 from services.openai_agent import openai_llm_chat
 
 class State(TypedDict):
-    messages = Annotated[list, add_messages]
+    messages: Annotated[list, add_messages]
     
 
 async def enterpreneur_agent(state: State):
-    return {"messages": openai_llm_chat.ainvoke(state['messages'])}
+    messages = await openai_llm_chat.ainvoke(state['messages'])
+    return {"messages": messages}
 
 
 async def graph_builder() -> CompiledStateGraph:
@@ -28,11 +29,12 @@ async def graph_builder() -> CompiledStateGraph:
 
 
 async def stream_graph_updates(user_input: str, system_prompt: str = enterpreneur_agent_prompt):
-    graph: CompiledStateGraph = graph_builder()
+    graph: CompiledStateGraph = await graph_builder()
     messages = [
         {"role": "system", "content": system_prompt}, 
         {"role": "user", "content": user_input}
     ]
-    for event in graph.stream({"messages": messages}):
-        for value in event.values:
-            print("Assistant:", value['messages'][-1].content)
+    async for event in graph.astream({"messages": messages}):
+        for value in event.values():
+            print(value)
+            print("Assistant:", value["messages"].content)
