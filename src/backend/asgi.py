@@ -12,11 +12,15 @@ import os
 from channels.routing import ProtocolTypeRouter
 from django.core.asgi import get_asgi_application
 
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-django_application = get_asgi_application()
+from .lg import LifespanMiddleware
 
+django_application = get_asgi_application()
+langgraph_lifespan = LifespanMiddleware()
 
 application = ProtocolTypeRouter({
-    "http": django_application
+    "http": django_application,
+    "lifespan": langgraph_lifespan
 })
