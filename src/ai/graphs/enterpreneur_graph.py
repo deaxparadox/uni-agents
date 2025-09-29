@@ -6,13 +6,16 @@ from langgraph.graph import END, StateGraph, START
 from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
 
+from ai.tools.common import thinking_tool
 from services.langgraph.db import Saver
 from services.openai_agent import openai_llm_chat
+
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
     
 
+    
 async def entrepreneur_chat_node(state: State):
     messages = await openai_llm_chat.ainvoke(state['messages'])
     return {"messages": messages}

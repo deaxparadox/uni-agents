@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-na5)h(vh)!gt4=%*--=&qgn1%c7qpp-p29ytl&d1^ux!8eli9z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "corsheaders",
 ] + [
     'ai.apps.AiConfig',
 ]
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -142,3 +144,6 @@ OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL")
 MIGRATION_MODULES = {
     'ai': "ai.migrations.ai"
 }
+
+
+CORS_ALLOW_ALL_ORIGINS: bool = True

@@ -13,9 +13,9 @@ class AgentView(APIView):
             agent_serializer = AgentSerializer(data=request.data)
             if agent_serializer.is_valid():
                 user_input = agent_serializer.validated_data.get("user_input")
-                await entrepreneur_agent(user_input)
-                return Response({"message": agent_serializer.data}, status=status.HTTP_200_OK)
-            return Response({"error": agent_serializer.errros}, status=status.HTTP_200_OK)
+                response: str = await entrepreneur_agent(user_input)
+                return Response({"message": response}, status=status.HTTP_200_OK)
+            return Response({"error": agent_serializer.errors}, status=status.HTTP_200_OK)
         except Exception as e:
             print(format_exc())
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
