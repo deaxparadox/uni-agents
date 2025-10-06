@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import User, AbstractBaseUser, UserManager
@@ -58,3 +60,7 @@ class BubbleUserModelAbstract(AbstractBaseUser):
 class BubbleUserModel(BubbleUserModelAbstract):
     pass
 
+    async def latest_chat_id(self) -> Any:
+        if await self.bubble_user_chat_ids.aexists():
+            return await self.bubble_user_chat_ids.order_by("-created_at").afirst()
+        return None

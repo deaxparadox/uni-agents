@@ -11,9 +11,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from bubbleio.models import BubbleUserModel
-from bubbleio.serializers import BubbleDataSerializer
+from bubbleio.serializers import BubbleDataSerializer, BubbleRefreshTokenSerializer
 from utils import base64
 from utils.exceptions import SIDTimeOutException
+
 
 class BubbleDataView(APIView):
     async def get(self, request):
@@ -27,7 +28,7 @@ class BubbleDataView(APIView):
                 return Response({"error": "Autentication session expired, please login in bubble dashboard again."}, status=status.HTTP_400_BAD_REQUEST)
             
             data = await base64.decode_string(sid_value)
-            base64.check_encoded_str_validity(data.get("expire_at"))
+            await base64.check_encoded_str_validity(data.get("expire_at"))
             bubble_user = await BubbleUserModel.objects.aget(
                 Q(bubble_user_id=data.get("bubble_user_id")) & 
                 Q(bubble_user_email=data.get("bubble_user_email"))
@@ -42,6 +43,7 @@ class BubbleDataView(APIView):
             }
             
             return Response({"messsage": tokens}, status=status.HTTP_200_OK)
+        
         except BubbleUserModel.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -85,6 +87,24 @@ class BubbleDataView(APIView):
             return Response(
                 {
                     "redirect_url": "https://brunda-fe-deploy.vercel.app?sid={}".format(sid_key),
+                },
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class BubbleRefreshTokenView(APIView):
+    async def post(self, request):
+        try:
+            serializer = BubbleRefreshTokenSerializer(data=request.data)
+            if serializer.is_valid():
+                refresh = RefreshToken(serializer.validated_data.get('refresh'))
+                new_access_token = str(refresh.access_token)
+                return Response({"message": {"access": new_access_token}}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "error": serializer.errors,
                 },
                 status=status.HTTP_200_OK
             )

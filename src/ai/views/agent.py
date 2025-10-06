@@ -3,11 +3,14 @@ from traceback import format_exc
 from adrf.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from ai.serializers.agent import AgentSerializer
 from ai.agents.enterpreneur_agent import entrepreneur_agent
 
 class AgentView(APIView):
+    permission_classes = (IsAuthenticated, )
+    
     async def post(self, request):
         try:
             agent_serializer = AgentSerializer(data=request.data)

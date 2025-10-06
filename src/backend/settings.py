@@ -142,15 +142,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AUTH_USER_MODEL = "bubbleio.UserModel"
 AUTH_USER_MODEL = "bubbleio.BubbleUserModel"
 
+
+# JWT SETTINGS
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
 # OpenAI Settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL")
+
 
 # Migration Setting
 MIGRATION_MODULES = {
     'ai': "ai.migrations.ai",
     "bubbleio": "bubbleio.migrations.bubbleio"
 }
+
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS: bool = True
