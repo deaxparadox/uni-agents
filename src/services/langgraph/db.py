@@ -9,12 +9,13 @@ class Saver:
 
 async def initialize_checkpointer():
 
-    DB_URI = f"postgresql://{settings.DATABASES['default']['USER']}:" \
-            f"{settings.DATABASES['default']['PASSWORD']}@" \
-            f"{settings.DATABASES['default']['HOST']}:" \
-            f"{settings.DATABASES['default']['PORT']}/" \
-            f"{settings.DATABASES['default']['NAME']}"
-
+    DB_URI = (
+        f"postgresql://{settings.DATABASES['default']['USER']}:" 
+        f"{settings.DATABASES['default']['PASSWORD']}@" 
+        f"{settings.DATABASES['default']['HOST']}:" 
+        f"{settings.DATABASES['default']['PORT']}/" 
+        f"{settings.DATABASES['default']['NAME']}"
+    )
     Saver.pool = AsyncConnectionPool(DB_URI, kwargs={"autocommit": True}, open=False)
     await Saver.pool.open()
     

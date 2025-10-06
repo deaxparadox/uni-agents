@@ -19,5 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/", include("ai.urls", namespace="ai"))
+    path("api/", include([
+        path("chat/", include("ai.urls", namespace="ai")),
+        path("bubble/", include("bubbleio.urls", namespace="bubbleio"))
+    ]))
 ]

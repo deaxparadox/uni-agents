@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "corsheaders",
 ] + [
     'ai.apps.AiConfig',
+    "bubbleio.apps.BubbleioConfig",
 ]
 
 MIDDLEWARE = [
@@ -137,13 +138,42 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# User Model
+# AUTH_USER_MODEL = "bubbleio.UserModel"
+AUTH_USER_MODEL = "bubbleio.BubbleUserModel"
+
+# OpenAI Settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL")
 
-
+# Migration Setting
 MIGRATION_MODULES = {
-    'ai': "ai.migrations.ai"
+    'ai': "ai.migrations.ai",
+    "bubbleio": "bubbleio.migrations.bubbleio"
 }
 
-
+# CORS Settings
 CORS_ALLOW_ALL_ORIGINS: bool = True
+
+
+# BUBBLE.IO
+BUBBLE_API_KEY = os.getenv("BUBBLE_API_KEY")
+BUBBLE_BASE_URL = os.getenv("BUBBLE_BASE_URL")
+BUBBLE_PASSWORD_DEFAULT = os.getenv('BUBBLE_PASSWORD_DEFAULT')
+
+
+# CACHE SETTINGS
+# Cache ttl (in seconds)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+CACHE_TTL = 600
+
+# SID TTL (in minutes)
+TTL = 5

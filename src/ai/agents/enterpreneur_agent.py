@@ -6,7 +6,8 @@ from typing_extensions import TypedDict
 from langgraph.graph.message import add_messages
 
 from ai.prompts.enterpreneur_assistant import enterpreneur_agent_prompt
-from ai.graphs import entrepreneur_graph
+from ai import graphs
+
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
@@ -20,7 +21,7 @@ async def entrepreneur_agent(user_input: str, system_prompt: str = enterpreneur_
     ]
     
     response: str = ""
-    async for chunk in entrepreneur_graph.astream(
+    async for chunk in graphs.entrepreneur_graph.astream(
         {"messages": messages},
         {"configurable": {"thread_id": "1"}},
         stream_mode="messages",
