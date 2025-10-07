@@ -84,7 +84,6 @@ class BubbleDataView(APIView):
             
             sid_key = str(uuid4())
             sid_value = await base64.encode_string(payload)
-            print(sid_key, sid_value)
             cache.set(sid_key, sid_value, timeout=settings.CACHE_TTL)
             
             return Response(
