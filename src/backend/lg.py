@@ -1,4 +1,5 @@
 from services.langgraph.db import initialize_checkpointer, Saver
+from graph_compiler import complie_graphs
 
 
 class LifespanMiddleware:
@@ -10,6 +11,11 @@ class LifespanMiddleware:
                     # Startup logic
                     print("ASGI Startup: Pool ready")
                     await initialize_checkpointer()
+                    
+                    # Initiazing all the graphs
+                    print("Initialzing graphs...")
+                    await complie_graphs()
+                    
                     await send({"type": "lifespan.startup.complete"})
 
                 elif message["type"] == "lifespan.shutdown":

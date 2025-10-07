@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.db import models
+from django.db.models import Q
 from django.core.mail import send_mail
 from django.contrib.auth.models import User, AbstractBaseUser, UserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -64,3 +65,4 @@ class BubbleUserModel(BubbleUserModelAbstract):
         if await self.bubble_user_chat_ids.aexists():
             return await self.bubble_user_chat_ids.order_by("-created_at").afirst()
         return None
+    

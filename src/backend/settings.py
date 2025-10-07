@@ -183,7 +183,7 @@ CACHES = {
         }
     }
 }
-CACHE_TTL = 600
+CACHE_TTL = 1800
 
 # SID TTL (in minutes)
-TTL = 5
+TTL = 30

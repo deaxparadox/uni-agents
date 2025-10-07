@@ -73,11 +73,14 @@ class BubbleDataView(APIView):
                 "bubble_user_email": serializer.validated_data.get("email"),
             }
             
-            bubble_user = await BubbleUserModel.objects.aget_or_create(
+            
+            bubble_user, created = await BubbleUserModel.objects.aget_or_create(
                 bubble_user_id=payload.get("bubble_user_id"),
                 bubble_user_email=payload.get("bubble_user_email"),
-                password=settings.BUBBLE_PASSWORD_DEFAULT
             )   
+            if created:
+                bubble_user.set_password(settings.BUBBLE_PASSWORD_DEFAULT)
+                await bubble_user.asave()
             
             sid_key = str(uuid4())
             sid_value = await base64.encode_string(payload)
@@ -91,6 +94,7 @@ class BubbleDataView(APIView):
                 status=status.HTTP_200_OK
             )
         except Exception as e:
+            print(format_exc())
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         

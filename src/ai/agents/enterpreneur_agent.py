@@ -13,7 +13,7 @@ class State(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-async def entrepreneur_agent(user_input: str, system_prompt: str = enterpreneur_agent_prompt):
+async def entrepreneur_agent(user_input: str, chat_id: str, /, system_prompt: str = enterpreneur_agent_prompt):
 
     messages = [
         {"role": "system", "content": system_prompt}, 
@@ -23,7 +23,7 @@ async def entrepreneur_agent(user_input: str, system_prompt: str = enterpreneur_
     response: str = ""
     async for chunk in graphs.entrepreneur_graph.astream(
         {"messages": messages},
-        {"configurable": {"thread_id": "1"}},
+        {"configurable": {"thread_id": chat_id}},
         stream_mode="messages",
     ):
         response += chunk[0].content
@@ -31,7 +31,7 @@ async def entrepreneur_agent(user_input: str, system_prompt: str = enterpreneur_
         #     print(value)
             # print("Assistant:", value["messages"].content)
     try:
-        print(response)
+        # print(response)
         response = response.replace('```json', "").replace("```", "")
         response = json.loads(response)
     except Exception as e:
