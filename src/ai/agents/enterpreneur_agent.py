@@ -5,15 +5,11 @@ from typing import Annotated
 from typing_extensions import TypedDict
 from langgraph.graph.message import add_messages
 
-from ai.prompts.enterpreneur_assistant import enterpreneur_agent_prompt
 from ai import graphs
+from ai.prompts.enterpreneur_assistant import entrepreneur_agent_prompt, entrepreneur_agent_client_prompt
 
 
-class State(TypedDict):
-    messages: Annotated[list, add_messages]
-
-
-async def entrepreneur_agent(user_input: str, chat_id: str, /, system_prompt: str = enterpreneur_agent_prompt):
+async def entrepreneur_agent(user_input: str, chat_id: str, /, system_prompt: str = entrepreneur_agent_client_prompt):
 
     messages = [
         {"role": "system", "content": system_prompt}, 
