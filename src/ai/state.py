@@ -6,4 +6,7 @@ from langgraph.graph.message import add_messages
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
-    # user_query: str
+    user_query: str
+    router_response: dict
+    final_resposne: str
+    chat_id: str

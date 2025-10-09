@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+import colorlog
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "corsheaders",
+    "channels",
 ] + [
     'ai.apps.AiConfig',
     "bubbleio.apps.BubbleioConfig",
@@ -150,6 +152,16 @@ REST_FRAMEWORK = {
     )
 }
 
+# CHANNELS CONFIGURATION
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
 # OpenAI Settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL")
@@ -189,6 +201,64 @@ CACHE_TTL = 1800
 TTL = 30
 
 
+LOG_DIR = BASE_DIR.joinpath("logs")
+LOG_DIR.mkdir(exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "bubbleio_app_file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "bubbleio_app.log",
+            "formatter": "verbose_file"
+        },
+        "ai_app_file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "ai_app.log",
+            "formatter": "verbose_file"
+        },
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose_console"
+        },
+    },
+    "formatters": {
+        "verbose_file": {
+            "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {filename} {message}",
+            "style": "{",
+        },
+        "verbose_console": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s⟦ %(name)s %(levelname)s %(asctime)s %(module)s %(filename)s ⟧ %(message)s",
+            "log_colors": {
+                "DEBUG": "blue",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+        "simple": {
+            "format": "\n{levelname} {message}\n",
+            "style": "{",
+        },
+    },
+    "loggers": {
+        "bubbleio": {
+            "level": "DEBUG",
+            "handlers": ["console", "bubbleio_app_file"],
+            "propagate": False,
+        },
+        "ai": {
+            "level": "DEBUG",
+            "handlers": ["console", "ai_app_file"],
+            "propagate": False,
+        }
+    }
+}
 # # LOGGING
 # LOGGING = {
 #     'version': 1,
