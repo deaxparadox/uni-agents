@@ -7,17 +7,20 @@ from langgraph.graph import END, StateGraph, START
 from langgraph.graph.state import CompiledStateGraph
 
 from ai.state import State
+from ai.llm.openai import openai_llm_chat, ideation_llm_chat
 from ai.prompts.entrepreneur_router_prompt import entrepreneur_router_prompt
 from ai.prompts.entrepreneur_roadmap_prompt import cofounder_agent_prompt
 from ai.prompts.entrepreneur_ideation_prompt import cofounder_ideation_agent_prompt
+from ai.publisher import log_route_event
 from services.langgraph.db import Saver
-from services.openai_agent import openai_llm_chat
 
 
 logger = logging.getLogger("ai")
 
 
 async def user_query_node(state: State):
+    chat_id = state['chat_id']
+    await log_route_event(chat_id, "User query", "Saving user query")
     return {"messages": [{"role": "user", "content": state['user_query']}]}
     
 
@@ -26,10 +29,18 @@ async def entrepreneur_router_agent(state: State):
     logger.debug("1111111111111111111111111111111")
     user_query = state['user_query']
     chat_id = state['chat_id']
+    
+    await log_route_event(chat_id, "router_agent", "Router: Analyzing user query")
+    
     logger.info(f"User query: {user_query}")
+    logger.debug(f"Message history: {state['messages']}")
+    
+    # get last five message
+    history = state['messages'][-10:]
     
     messages = [
         {"role": "system", "content": entrepreneur_router_prompt},
+        *history,
         {"role": "user", "content": user_query}
     ]
     
@@ -39,6 +50,10 @@ async def entrepreneur_router_agent(state: State):
     response = json.loads(response_content_string)
     logger.info(f"Router agent response: {response}")
     state["router_response"] = response
+    recommended_node = state['router_response']
+    
+    await log_route_event(chat_id, "router_agent", f"Router: Routing to {recommended_node}")
+    
     return state
 
 async def entrepneur_conditional_node(state: State):
@@ -59,6 +74,8 @@ async def entrepreneur_roadmap_agent(state: State):
     user_query = state['user_query']
     chat_id = state["chat_id"]
     
+    await log_route_event(chat_id, "roadmap_agent", f"Roadmap: Understanding and getting details for building roadmap...")
+    
     messages = [
         {"role": "system", "content": cofounder_agent_prompt},
         {"role": "user", "content": user_query}
@@ -70,6 +87,9 @@ async def entrepreneur_roadmap_agent(state: State):
     response = json.loads(response_content_string)
     logger.info(f"Roadmap agent response: {response}")
     state["final_response"] = response
+    
+    await log_route_event(chat_id, "roadmap_agent", f"Roadmap: Generated roadmap...")
+    
     return {
         "messages": [
             {"role": "assistant", "content": response_content_string}
@@ -81,18 +101,25 @@ async def entrepreneur_ideation_agent(state: State):
     user_query = state['user_query']
     chat_id = state["chat_id"]
     
+    await log_route_event(chat_id, "ideation_agent", f"Ideation: Understanding user query...")
+    
+    history = state['messages'][-10:]
     messages = [
         {"role": "system", "content": cofounder_ideation_agent_prompt},
+        *history,
         {"role": "user", "content": user_query}
     ]
     
-    response = await openai_llm_chat.ainvoke(messages, config={'configurable': {"thread_id": chat_id}})
-    response_content = response.content
+    response = await ideation_llm_chat.ainvoke({'messages': messages}, config={'configurable': {"thread_id": chat_id}})
+    response_content = response['messages'][-1].content
     logger.info(f"Ideation agent content:, {response_content}, {type(response_content)}")
     response_content_string = response_content.replace("```json", "").replace("```", "")
     response = json.loads(response_content_string)
     logger.info(f"Ideation agent response: {response}")
     state["final_response"] = response
+    
+    await log_route_event(chat_id, "ideation_agent", f"Ideation: Forming final response...")
+    
     return {
         "messages": [
             {"role": "assistant", "content": response_content_string}
