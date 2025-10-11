@@ -21,3 +21,5 @@ djangorestframework-simplejwt==5.5.1
 colorlog==6.9.0
 # langchain-community==0.3.31
 # googlemaps==4.10.0
+aiofiles==25.1.0
+django-ratelimit==4.1.0

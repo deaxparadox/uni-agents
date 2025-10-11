@@ -9,7 +9,7 @@ from langgraph.graph.state import CompiledStateGraph
 from ai.state import State
 from ai.llm.openai import openai_llm_chat, ideation_llm_chat
 from ai.prompts.entrepreneur_router_prompt import entrepreneur_router_prompt
-from ai.prompts.entrepreneur_roadmap_prompt import cofounder_agent_prompt
+from ai.prompts.entrepreneur_roadmap_prompt import cofounder_roadmap_prompt
 from ai.prompts.entrepreneur_ideation_prompt import cofounder_ideation_agent_prompt
 from ai.publisher import log_route_event
 from services.langgraph.db import Saver
@@ -76,14 +76,17 @@ async def entrepreneur_roadmap_agent(state: State):
     
     await log_route_event(chat_id, "roadmap_agent", f"Roadmap: Understanding and getting details for building roadmap...")
     
+    cofounder_prompt = await cofounder_roadmap_prompt()
     messages = [
-        {"role": "system", "content": cofounder_agent_prompt},
+        {"role": "system", "content": cofounder_prompt},
         {"role": "user", "content": user_query}
     ]
     
     response = await openai_llm_chat.ainvoke(messages, config={'configurable': {"thread_id": chat_id}})
+    logger.debug("Roadmap raw repsones: {}".format(response))
     response_content = response.content
     response_content_string = response_content.replace("```json", "").replace("```", "")
+    logger.debug("Roadmap repsones error: {}".format(response_content_string))
     response = json.loads(response_content_string)
     logger.info(f"Roadmap agent response: {response}")
     state["final_response"] = response

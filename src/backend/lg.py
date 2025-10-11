@@ -2,6 +2,7 @@ from services.langgraph.db import initialize_checkpointer, Saver
 from graph_compiler import complie_graphs
 
 
+
 class LifespanMiddleware:
     async def __call__(self, scope, receive, send):
         if scope["type"] == "lifespan":
