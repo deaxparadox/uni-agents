@@ -35,7 +35,7 @@ step-3:
     template_name: Contract_Tracker.xlsx
     description: description
 step-4:
-  mvp_templates_and_checklists: 4.1_MVP_Templates_and_Checklists.xlsx
+  mvp_templates_and_checklists: MVP_Templates_and_Checklists.xlsx
 step-5:
   business_tools_evaluation_matrix:
     template_name: Business_Tools_Evaluation_Matrix.xlsx

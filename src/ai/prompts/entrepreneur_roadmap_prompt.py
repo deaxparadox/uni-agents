@@ -336,7 +336,7 @@ async def cofounder_roadmap_prompt():
     "type": "entrepreneurial_response"
     and fill "data" using the detailed schema below.
 
-    - If you don't have sufficient user information for bilding roadmap, use:
+    - If you don't have sufficient user information for building roadmap, use:
     "type": "general_response"
     and include a plain text or Markdown response as a string inside "data",
     and ask user follow up questions to get information.
@@ -498,4 +498,9 @@ async def cofounder_roadmap_prompt():
     - Maintain valid JSON.
     - Ensure roadmap remains sequential (1–7 steps).
     - Maintain consistent tone, realism, and structured guidance.
+    
+    ------------------------------------------------------------
+    Example for General Response:
+    ------------------------------------------------------------
+    ```json{"type": "general_response", "data": "To generate an actionable roadmap for your startup, I need some more information. Please provide details regarding:\n\n1. **Domain**: You mentioned marketing and sales via consultation, but is there a specific niche or sector you're targeting within this domain?\n2. **Problem**: What specific problem does your startup aim to solve through these consultations?\n3. **Target Market**: Who are your intended customers or users? Are you targeting small businesses, enterprises, startups, or another group?\n4. **Solution Idea**: You mentioned using an AI model for agent reach and business development. Could you elaborate on how this AI model works and its primary features?\n5. **Existing MVP**: Do you currently have a Minimum Viable Product or anything developed?\n6. **Resources**: What resources do you currently have at your disposal (e.g., team, capital, tools)?\n7. **Goals**: What are your short-term and long-term goals for the startup?\n\nWith this information, I can create a detailed 7-step roadmap tailored to your startup idea."}```
     """ % template_workbook_data

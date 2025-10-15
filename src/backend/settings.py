@@ -174,6 +174,11 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL")
 
 
+# Pinecone keys
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX_NAME = os.getenv('PINECONE_INDEX_NAME')
+PINECONE_TOP_K = 5
+
 # Migration Setting
 MIGRATION_MODULES = {
     'ai': "ai.migrations.ai",

@@ -12,7 +12,12 @@ from ai.prompts.entrepreneur_roadmap_prompt import (
 )
 
 
-async def entrepreneur_agent(user_input: str, chat_id: str, /, system_prompt: str = cofounder_agent_client_prompt):
+async def entrepreneur_agent(
+    user_input: str, 
+    chat_id: str, 
+    /, 
+    system_prompt: str = cofounder_agent_client_prompt
+):
 
     message_state = {
         "messages": [
@@ -35,11 +40,18 @@ async def entrepreneur_agent(user_input: str, chat_id: str, /, system_prompt: st
         #     print(value)
             # print("Assistant:", value["messages"].content)
             
+        if "entrepreneur_overview_agent" in chunk:
+            response = chunk["entrepreneur_overview_agent"]['messages'][0]['content']
+        
+        if "enrich_roadmap_with_resources" in chunk:
+            response = chunk["enrich_roadmap_with_resources"]['messages'][0]['content']
+           
         if "entrepreneur_ideation_agent" in chunk:
             response = chunk["entrepreneur_ideation_agent"]['messages'][0]['content']
             
-        if "entrepreneur_roadmap_agent" in chunk:
-            response = chunk["entrepreneur_roadmap_agent"]['messages'][0]['content']
+        if "image_generation_agent" in chunk:
+            response = chunk["image_generation_agent"]['messages'][0]['content']
+            
     try:
         # print(response)
         response = response.replace('```json', "").replace("```", "")
