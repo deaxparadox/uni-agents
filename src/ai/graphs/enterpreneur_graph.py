@@ -235,9 +235,12 @@ async def enrich_roadmap_with_resources(state: State) -> List[Dict]:
             logger.info(f"Enrich roadmap agent response: {response}")
             
             logger.info(f"Response for step: {response}")
-            step['resources'] = [r['title'] for r in response]
+            step['resources'] = [
+                {"title": r['title'], "url": r['url']}
+                for r in response
+            ]
             # enriched_steps.append(step)
-            break
+            # break
     return {
         "messages": [
             {"role": "assistant", "content": json.dumps(final_response)}
