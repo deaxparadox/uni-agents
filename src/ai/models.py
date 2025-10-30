@@ -25,3 +25,18 @@ class AgentChatIDModel(models.Model):
     deleted = models.BooleanField(verbose_name=_("Chat ID deleted"), default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    
+class TokenUsage(models.Model):
+    bubble_user = models.ForeignKey(
+        BubbleUserModel, 
+        on_delete=models.SET_NULL, 
+        null=True,
+        related_name="bubble_user_token_usage",
+        verbose_name=_("Bubble user")
+    )
+    token_count = models.IntegerField(default=20000, verbose_name=_("Token count"))
+    token_used = models.IntegerField(default=0, verbose_name=_("Token used"))
+    
+    async def token_available(self):
+        return self.token_used <= self.token_count
