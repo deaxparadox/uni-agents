@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from ai.serializers.agent import AgentSerializer
 from ai.agents.enterpreneur_agent import entrepreneur_agent
+from ai.tokens import total_tokens
+
 
 class AgentView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -22,6 +24,7 @@ class AgentView(APIView):
             if agent_serializer.is_valid():
                 user_input = agent_serializer.validated_data.get("user_input")
                 response: str = await entrepreneur_agent(user_input, chat_id)
+                print("Total tokens:", await total_tokens.get())
                 return Response({"message": response}, status=status.HTTP_200_OK)   
             
             # if agent_serializer.is_valid():

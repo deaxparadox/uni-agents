@@ -21,6 +21,7 @@ from ai.prompts.entrepreneur_router_prompt import entrepreneur_router_prompt
 from ai.prompts.enterpreneur_get_step_resources import get_resources_for_step_prompt
 from ai.prompts.enterpreneur_image_agent_prompt import image_generation_prompt
 from ai.publisher import log_route_event
+from ai.tokens import total_tokens
 from ai.tools.image_generation import image_gen
 from services.langgraph.db import Saver
 from utils.json import normalize_json_response
@@ -82,6 +83,10 @@ async def entrepreneur_router_agent(state: State):
     ]
     
     response = await openai_llm_chat.ainvoke(messages, config={'configurable': {"thread_id": chat_id}}, stream=False)
+    
+    tokens = response.response_metadata.get('token_usage').get('total_tokens')
+    await total_tokens.add(tokens)
+    
     response_content = response.content
     response_content_string = await remove_language_annotation(response_content, language="json")
     response = json.loads(response_content_string)
@@ -148,6 +153,7 @@ async def entrepreneur_ideation_agent(state: State):
     ]
     
     response = await ideation_llm_chat.ainvoke({'messages': messages}, config={'configurable': {"thread_id": chat_id}})
+    logger.info("Raw ideation respones: {}".format(response))
     response_content = response['messages'][-1].content
     logger.info(f"Ideation agent content:, {response_content}, {type(response_content)}")
     response_content_string = await remove_language_annotation(response_content, language="json")
