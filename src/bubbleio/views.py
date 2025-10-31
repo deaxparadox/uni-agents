@@ -25,8 +25,9 @@ class BubbleDataView(APIView):
                 return Response({"error": "Invalid session id"}, status=status.HTTP_400_BAD_REQUEST)
             
             print(cache)
-            print(sid_key, sid_value, settings.CACHE_TTL)
             sid_value = cache.get(sid_key)
+            print(sid_key, sid_value, settings.CACHE_TTL)
+            
             if not sid_value:
                 return Response({"error": "Autentication session expired, please login in bubble dashboard again."}, status=status.HTTP_400_BAD_REQUEST)
             
