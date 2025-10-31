@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from asgiref.sync import sync_to_async
 from adrf.views import APIView
+from django.db import IntegrityError
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
@@ -88,10 +89,28 @@ class BubbleDataView(APIView):
             
             return Response(
                 {
-                    "redirect_url": "https://brunda-fe-deploy.vercel.app?sid={}".format(sid_key),
+                    "redirect_url": settings.FRONTEND_URL.format(sid_key),
                 },
                 status=status.HTTP_200_OK
             )
+        
+        except IntegrityError:
+            # If creation fails due to race condition, get the existing user
+            bubble_user = await BubbleUserModel.objects.aget(
+                bubble_user_id=payload.get("bubble_user_id")
+            )
+        
+            sid_key = str(uuid4())
+            sid_value = await base64.encode_string(payload)
+            cache.set(sid_key, sid_value, timeout=settings.CACHE_TTL)
+            
+            return Response(
+                {
+                    "redirect_url": settings.FRONTEND_URL.format(sid_key),
+                },
+                status=status.HTTP_200_OK
+            )
+            
         except Exception as e:
             print(format_exc())
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
