@@ -26,18 +26,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-na5)h(vh)!gt4=%*--=&qgn1%c7qpp-p29ytl&d1^ux!8eli9z'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    # "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -159,12 +159,17 @@ REST_FRAMEWORK = {
     )
 }
 
+# REDIS CONFIGURATION
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = int(os.getenv('REDIS_PORT'))
+
+
 # CHANNELS CONFIGURATION
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
@@ -201,7 +206,7 @@ BUBBLE_PASSWORD_DEFAULT = os.getenv('BUBBLE_PASSWORD_DEFAULT')
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://{host}:{port}/1".format(host=REDIS_HOST, port=REDIS_PORT),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -305,3 +310,9 @@ AGENT_TRACKING = False
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 FRONTEND_URL = os.getenv("FRONTEND_URL")
+
+
+SIMPLE_JWT = {
+    "ALGORITHM": os.getenv("JWT_ALGORITHM"),
+    "SIGNING_KEY": os.getenv("SECRET_KEY")
+}

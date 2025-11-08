@@ -18,8 +18,8 @@ class AgentView(APIView):
         try:
             token, _ = await TokenUsage.objects.aget_or_create(bubble_user=request.user)
             
-            if not await token.token_available():
-                return Response({"notifiy": "Token consumed, please buy the tokens"}, status=status.HTTP_402_PAYMENT_REQUIRED)
+            # if not await token.token_available():
+            #     return Response({"notifiy": "Token consumed, please buy the tokens"}, status=status.HTTP_402_PAYMENT_REQUIRED)
             
             chat_id = request.query_params.get("chat-id")
             if not chat_id:
