@@ -155,7 +155,8 @@ AUTH_USER_MODEL = "bubbleio.BubbleUserModel"
 # JWT SETTINGS
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
     )
 }
 
@@ -316,3 +317,5 @@ SIMPLE_JWT = {
     "ALGORITHM": os.getenv("JWT_ALGORITHM"),
     "SIGNING_KEY": os.getenv("SECRET_KEY")
 }
+
+STS_TOKEN_ENDPOINT = os.getenv("STS_TOKEN_ENDPOINT")

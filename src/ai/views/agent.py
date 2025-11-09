@@ -1,6 +1,11 @@
+import inspect
+from functools import wraps
+import logging
 from traceback import format_exc
 
 from adrf.views import APIView
+import aiohttp
+from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -11,12 +16,35 @@ from ai.agents.enterpreneur_agent import entrepreneur_agent
 from ai.tokens import total_tokens
 
 
+
+
+def sts_token_generate(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        if inspect.iscoroutinefunction(func):
+            async with aiohttp.ClientSession() as session:
+                async with session.post(settings.STS_TOKEN_ENDPOINT, json={"service_name": "agent_service"}) as response:
+                    if response.status != 200:
+                        print("Error with service to token service...")
+                        return Response({"error": "Auth service is down unable to sts token."})
+                    data: dict[str, str] = await response.json()
+                    token = data.get("token")
+                    print("sts-token", token)
+                    # check user is active
+            result = await func(*args, **kwargs)
+        else:
+            result = func(*args, **kwargs)
+        return result
+    return wrapper
+
 class AgentView(APIView):
     permission_classes = (IsAuthenticated, )
     
+    @sts_token_generate
     async def post(self, request):
         try:
-            token, _ = await TokenUsage.objects.aget_or_create(bubble_user=request.user)
+            print(request.user)
+            # token, _ = await TokenUsage.objects.aget_or_create(bubble_user=request.user)
             
             # if not await token.token_available():
             #     return Response({"notifiy": "Token consumed, please buy the tokens"}, status=status.HTTP_402_PAYMENT_REQUIRED)
@@ -32,8 +60,8 @@ class AgentView(APIView):
                 response: str = await entrepreneur_agent(user_input, chat_id)
                 tokens = await total_tokens.get()
                 print("Total tokens:", tokens)
-                token.token_used += tokens
-                await token.asave()
+                # token.token_used += tokens
+                # await token.asave()
                 return Response({"message": response}, status=status.HTTP_200_OK)   
             
             # if agent_serializer.is_valid():

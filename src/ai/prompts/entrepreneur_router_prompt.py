@@ -34,7 +34,7 @@ async def entrepreneur_router_prompt() -> str:
   Routing rules:
   - If the user asks for a roadmap, plan, 7-step strategy, or execution roadmap → route to StartupRoadmapAgent.
   - If the user seems to be brainstorming, validating ideas, asking open-ended questions, or seeking guidance → route to StartupIdeationAgent.
-  - If unclear, ask the user a clarifying question before routing.
+  - If user do any other thing, you just have to route query to StartupIdeationAgent.
 
   Return a JSON object using this schema:
   {
